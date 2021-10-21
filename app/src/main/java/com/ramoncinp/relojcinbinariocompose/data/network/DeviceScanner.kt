@@ -58,8 +58,7 @@ class DeviceScanner {
                 }
 
                 Log.d("UDPScanner", "This device responded -> $clientAddress")
-            }
-            catch (e: Exception) {
+            } catch (e: Exception) {
                 break
             }
         }

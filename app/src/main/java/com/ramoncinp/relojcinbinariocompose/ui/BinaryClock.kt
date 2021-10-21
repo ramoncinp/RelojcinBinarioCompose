@@ -13,7 +13,6 @@ import com.ramoncinp.relojcinbinariocompose.ui.shapes.Circle
 
 @Composable
 fun BinaryClock(bcdBinaryTime: BcdBinaryTime) {
-
     LazyRow(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceEvenly) {
         items(bcdBinaryTime.timeElements) { timeElement ->
             BinaryColumn(timeElement)

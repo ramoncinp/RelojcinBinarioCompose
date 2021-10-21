@@ -14,21 +14,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
-class MainViewModel constructor(
-    private val deviceScanner: DeviceScanner = DeviceScanner()
-) : ViewModel() {
+class MainViewModel : ViewModel() {
 
     private val _currentBinaryTime = MutableLiveData<BcdBinaryTime>()
     val currentBinaryTime: LiveData<BcdBinaryTime>
         get() = _currentBinaryTime
-
-    private val _connectedDevices = deviceScanner.connectedDevices
-    val connectedDevices: LiveData<List<String>>
-        get() = _connectedDevices
-
-    private val _isLoading = MutableLiveData<Boolean>()
-    val isLoading: LiveData<Boolean>
-        get() = _isLoading
 
     init {
         startTimeTask()
@@ -52,13 +42,5 @@ class MainViewModel constructor(
         val formattedDate = dateFormatter.format(now)
         Log.d("MainViewModel", formattedDate)
         return formattedDate
-    }
-
-    fun scanForDevices() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            deviceScanner.scanForDevices()
-            _isLoading.value = false
-        }
     }
 }
