@@ -17,6 +17,7 @@ class DeviceScanner {
     private var datagramSocket: DatagramSocket? = null
     val connectedDevices = MutableLiveData<List<String>>()
 
+    @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun scanForDevices() {
         withContext(Dispatchers.IO) {
             datagramSocket = DatagramSocket()
@@ -45,7 +46,7 @@ class DeviceScanner {
         val devices = mutableListOf<String>()
 
         while (true) {
-            @Suppress("BlockingMethodInNonBlockingContext")
+
             try {
                 val buffer = ByteArray(512)
                 val receivedPacket = DatagramPacket(buffer, buffer.size)
