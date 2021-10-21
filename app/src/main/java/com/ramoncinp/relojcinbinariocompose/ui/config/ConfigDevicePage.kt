@@ -22,6 +22,7 @@ fun DeviceConfigurationScreen(navController: NavController) {
     val viewModel: ConfigDeviceViewModel = viewModel()
     val isLoading = viewModel.isLoading.observeAsState(initial = false)
     val connectedDevices = viewModel.connectedDevices.observeAsState(listOf())
+    val selectedDevice = viewModel.selectedDevice.observeAsState("")
 
     Scaffold(
         topBar = {
@@ -39,7 +40,7 @@ fun DeviceConfigurationScreen(navController: NavController) {
                 if (connectedDevices.value.isEmpty()) {
                     NoDevicesMessage()
                 } else {
-                    DeviceConfigContent()
+                    DeviceConfigContent(selectedDevice.value)
                 }
             }
         }
@@ -47,8 +48,13 @@ fun DeviceConfigurationScreen(navController: NavController) {
 }
 
 @Composable
-fun DeviceConfigContent() {
-
+fun DeviceConfigContent(device: String) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(device, style = MaterialTheme.typography.h6, modifier = Modifier.padding(16.dp))
+    }
 }
 
 @Composable

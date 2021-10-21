@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ramoncinp.relojcinbinariocompose.data.BcdBinaryTime
 import com.ramoncinp.relojcinbinariocompose.data.mappers.BcdBinaryTimeMapper
-import com.ramoncinp.relojcinbinariocompose.data.network.DeviceScanner
 import com.ramoncinp.relojcinbinariocompose.domain.dateFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

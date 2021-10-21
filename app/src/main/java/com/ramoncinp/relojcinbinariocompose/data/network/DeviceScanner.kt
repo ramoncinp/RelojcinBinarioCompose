@@ -14,17 +14,17 @@ private const val PORT = 2400
 
 class DeviceScanner {
 
+    private val devices = mutableListOf<String>()
     private var datagramSocket: DatagramSocket? = null
-    val connectedDevices = MutableLiveData<List<String>>()
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun scanForDevices() {
-        withContext(Dispatchers.IO) {
-            datagramSocket = DatagramSocket()
-            sendMessage()
-            waitForResponse()
-        }
+    suspend fun scanForDevices() = withContext(Dispatchers.IO) {
+        datagramSocket = DatagramSocket()
+        sendMessage()
+        waitForResponse()
+        return@withContext devices
     }
+
 
     private fun sendMessage() {
         datagramSocket?.broadcast = true
@@ -43,7 +43,7 @@ class DeviceScanner {
     }
 
     private fun waitForResponse() {
-        val devices = mutableListOf<String>()
+        devices.clear()
 
         while (true) {
 
@@ -63,7 +63,6 @@ class DeviceScanner {
             }
         }
 
-        connectedDevices.postValue(devices)
         datagramSocket?.close()
     }
 }
