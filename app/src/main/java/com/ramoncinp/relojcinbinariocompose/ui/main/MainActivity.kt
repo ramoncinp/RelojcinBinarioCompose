@@ -5,12 +5,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,6 +60,7 @@ fun AppBar(title: String) {
 fun MyApp() {
     val viewModel: MainViewModel = viewModel()
     val time = viewModel.currentBinaryTime.observeAsState(getInitialBinaryTime())
+    val isLoading = viewModel.isLoading.observeAsState(false)
 
     Scaffold(
         topBar = { AppBar(title = "Binary Clock") }
@@ -66,8 +68,22 @@ fun MyApp() {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            BinaryClock(time.value)
+            if (isLoading.value) {
+                ShowProgress()
+            } else {
+                BinaryClock(time.value)
+            }
         }
+    }
+}
+
+@Composable
+fun ShowProgress() {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        CircularProgressIndicator()
     }
 }
 

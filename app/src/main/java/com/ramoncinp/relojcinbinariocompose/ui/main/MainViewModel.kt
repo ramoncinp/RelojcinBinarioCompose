@@ -26,6 +26,10 @@ class MainViewModel constructor(
     val connectedDevices: LiveData<List<String>>
         get() = _connectedDevices
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     init {
         startTimeTask()
     }
@@ -52,7 +56,9 @@ class MainViewModel constructor(
 
     fun scanForDevices() {
         viewModelScope.launch {
+            _isLoading.value = true
             deviceScanner.scanForDevices()
+            _isLoading.value = false
         }
     }
 }
