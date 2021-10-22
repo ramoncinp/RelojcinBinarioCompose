@@ -1,6 +1,6 @@
 package com.ramoncinp.relojcinbinariocompose.data.mappers
 
-import com.ramoncinp.relojcinbinariocompose.data.BcdBinaryTime
+import com.ramoncinp.relojcinbinariocompose.data.models.BcdBinaryTime
 import com.ramoncinp.relojcinbinariocompose.domain.toBinaryNibbleString
 
 class BcdBinaryTimeMapper {

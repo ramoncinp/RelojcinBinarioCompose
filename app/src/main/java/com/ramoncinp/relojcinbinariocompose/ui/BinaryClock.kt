@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.ramoncinp.relojcinbinariocompose.data.BcdBinaryTime
+import com.ramoncinp.relojcinbinariocompose.data.models.BcdBinaryTime
 import com.ramoncinp.relojcinbinariocompose.ui.shapes.Circle
 
 @Composable

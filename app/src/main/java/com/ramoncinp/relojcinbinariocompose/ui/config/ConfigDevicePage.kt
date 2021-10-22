@@ -14,15 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 
 @Composable
 fun DeviceConfigurationScreen(navController: NavController) {
-    val viewModel: ConfigDeviceViewModel = viewModel()
+    val viewModel: ConfigDeviceViewModel = hiltViewModel()
     val isLoading = viewModel.isLoading.observeAsState(initial = false)
     val connectedDevices = viewModel.connectedDevices.observeAsState(listOf())
-    val selectedDevice = viewModel.selectedDevice.observeAsState("")
+    val selectedDevice = viewModel.selectedDevice.observeAsState(DeviceData())
 
     Scaffold(
         topBar = {
@@ -48,12 +49,12 @@ fun DeviceConfigurationScreen(navController: NavController) {
 }
 
 @Composable
-fun DeviceConfigContent(device: String) {
+fun DeviceConfigContent(device: DeviceData) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(device, style = MaterialTheme.typography.h6, modifier = Modifier.padding(16.dp))
+        Text(device.ssid, style = MaterialTheme.typography.h6, modifier = Modifier.padding(16.dp))
     }
 }
 

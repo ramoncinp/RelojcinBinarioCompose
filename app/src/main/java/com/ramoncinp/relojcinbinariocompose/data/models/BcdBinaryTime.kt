@@ -1,4 +1,4 @@
-package com.ramoncinp.relojcinbinariocompose.data
+package com.ramoncinp.relojcinbinariocompose.data.models
 
 data class BcdBinaryTime(val timeElements: List<String>)
 

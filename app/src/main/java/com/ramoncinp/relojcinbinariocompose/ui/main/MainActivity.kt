@@ -17,7 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ramoncinp.relojcinbinariocompose.data.getInitialBinaryTime
+import com.ramoncinp.relojcinbinariocompose.data.models.getInitialBinaryTime
 import com.ramoncinp.relojcinbinariocompose.ui.BinaryClock
 import com.ramoncinp.relojcinbinariocompose.ui.config.DeviceConfigurationScreen
 import com.ramoncinp.relojcinbinariocompose.ui.theme.RelojcinBinarioComposeTheme
@@ -54,12 +54,8 @@ fun AppBar(title: String, actionOnClick: () -> Unit) {
 fun MyApp() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "binary_clock") {
-        composable("binary_clock") {
-            BinaryClockScreen(navController)
-        }
-        composable("device_config") {
-            DeviceConfigurationScreen(navController)
-        }
+        composable("binary_clock") { BinaryClockScreen(navController) }
+        composable("device_config") { DeviceConfigurationScreen(navController) }
     }
 }
 
