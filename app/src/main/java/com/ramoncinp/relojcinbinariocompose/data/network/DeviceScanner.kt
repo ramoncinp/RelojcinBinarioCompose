@@ -1,9 +1,8 @@
 package com.ramoncinp.relojcinbinariocompose.data.network
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -39,7 +38,7 @@ class DeviceScanner {
         )
 
         datagramSocket?.send(packetToSend)
-        Log.d("UDPScanner", "Data is now sent!")
+        Timber.d("Data is now sent!")
     }
 
     private fun waitForResponse() {
@@ -57,7 +56,7 @@ class DeviceScanner {
                     devices.add(clientAddress)
                 }
 
-                Log.d("UDPScanner", "This device responded -> $clientAddress")
+                Timber.d("This device responded -> $clientAddress")
             } catch (e: Exception) {
                 break
             }

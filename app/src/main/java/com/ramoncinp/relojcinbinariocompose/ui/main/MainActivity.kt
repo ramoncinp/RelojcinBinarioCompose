@@ -21,7 +21,9 @@ import com.ramoncinp.relojcinbinariocompose.data.getInitialBinaryTime
 import com.ramoncinp.relojcinbinariocompose.ui.BinaryClock
 import com.ramoncinp.relojcinbinariocompose.ui.config.DeviceConfigurationScreen
 import com.ramoncinp.relojcinbinariocompose.ui.theme.RelojcinBinarioComposeTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
