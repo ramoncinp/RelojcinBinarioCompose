@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 import com.ramoncinp.relojcinbinariocompose.data.network.DeviceScanner
 import com.ramoncinp.relojcinbinariocompose.data.repository.DeviceCommunicator
-import com.ramoncinp.relojcinbinariocompose.domain.OK_RESULT
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -66,5 +65,9 @@ class ConfigDeviceViewModel @Inject constructor(
             val chosenDevice = devices[0]
             initDevice(chosenDevice)
         }
+    }
+
+    fun editDevice(deviceData: DeviceData) {
+        _selectedDevice.value = deviceData
     }
 }
