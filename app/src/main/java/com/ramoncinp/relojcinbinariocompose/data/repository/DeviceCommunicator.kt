@@ -10,7 +10,7 @@ interface DeviceCommunicator {
 
     fun setData(deviceData: DeviceData)
 
-    fun setBrightness(percentage: Int)
+    suspend fun setBrightness(percentage: Int)
 
     fun syncHour(currentHour: Int)
 

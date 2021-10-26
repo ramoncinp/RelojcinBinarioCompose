@@ -3,6 +3,8 @@ package com.ramoncinp.relojcinbinariocompose.data.models
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
+const val MAX_BRIGHTNESS_VALUE = 1024
+
 @JsonClass(generateAdapter = true)
 data class GetDeviceDataResponse(
     val message: String,

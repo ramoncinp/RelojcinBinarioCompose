@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
+import timber.log.Timber
 
 @Composable
 fun DeviceConfigurationScreen(navController: NavController) {
@@ -64,6 +66,7 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
+
         TextField(
             value = device.pass,
             onValueChange = { newVal -> viewModel.editDevice(device.copy(pass = newVal)) },
@@ -75,6 +78,16 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
+
+        TextField(
+            value = device.hourZone.toString(),
+            onValueChange = { newVal -> viewModel.editDevice(device.copy(hourZone = newVal.toInt())) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            label = { Text("Time zone") },
+            placeholder = { Text("Time zone") },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
         Row(modifier = Modifier.padding(bottom = 16.dp)) {
             Switch(
                 checked = device.alarm,
@@ -87,8 +100,9 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 TextField(
-                    value = "",
-                    onValueChange = { },
+                    value = device.alarmHour.toString(),
+                    onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmHour = newVal.toInt())) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     label = { Text("Hour") },
                     placeholder = { Text("Hour") },
                     modifier = Modifier
@@ -96,10 +110,37 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
                         .padding(end = 16.dp)
                 )
                 TextField(
-                    value = "",
-                    onValueChange = { },
+                    value = device.alarmMinute.toString(),
+                    onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmMinute = newVal.toInt())) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     label = { Text("Minute") },
                     placeholder = { Text("Minute") }
+                )
+            }
+        }
+
+        BrightnessEditor(viewModel)
+    }
+}
+
+@Composable
+fun BrightnessEditor(viewModel: ConfigDeviceViewModel) {
+    val brightnessValue = viewModel.brightnessPercentage.observeAsState(initial = 0f)
+
+    Column {
+        Text(text = "Brightness", modifier = Modifier.padding(bottom = 8.dp, top = 16.dp))
+        Row (modifier = Modifier.padding(end = 16.dp)) {
+            Slider(
+                value = brightnessValue.value,
+                onValueChange = { newPercentage -> viewModel.setBrightnessValue(newPercentage) },
+                Modifier.padding(end = 24.dp)
+            )
+            IconButton(
+                modifier = Modifier.requiredWidth(64.dp),
+                onClick = { viewModel.sendNewBrightnessValue() }) {
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = "Set brightness"
                 )
             }
         }

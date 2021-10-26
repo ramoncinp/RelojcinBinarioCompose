@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ramoncinp.relojcinbinariocompose.data.mappers.pwmValueToPercentage
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 import com.ramoncinp.relojcinbinariocompose.data.network.DeviceScanner
 import com.ramoncinp.relojcinbinariocompose.data.repository.DeviceCommunicator
@@ -30,6 +31,10 @@ class ConfigDeviceViewModel @Inject constructor(
     val selectedDevice: LiveData<DeviceData>
         get() = _selectedDevice
 
+    private val _brightnessPercentage = MutableLiveData<Float>()
+    val brightnessPercentage: LiveData<Float>
+        get() = _brightnessPercentage
+
     init {
         scanForDevices()
     }
@@ -44,6 +49,7 @@ class ConfigDeviceViewModel @Inject constructor(
             val deviceData = deviceCommunicator.getData()
             deviceData?.let { data ->
                 _selectedDevice.value = data
+                _brightnessPercentage.value = pwmValueToPercentage(deviceData.pwmValue) / 100f
             }
         } catch (e: Exception) {
             Timber.e(e.toString())
@@ -69,5 +75,18 @@ class ConfigDeviceViewModel @Inject constructor(
 
     fun editDevice(deviceData: DeviceData) {
         _selectedDevice.value = deviceData
+    }
+
+    fun setBrightnessValue(newValue: Float) {
+        Timber.d("The new brightness value is $newValue")
+        _brightnessPercentage.value = newValue
+    }
+
+    fun sendNewBrightnessValue() = viewModelScope.launch {
+        _brightnessPercentage.value?.times(100)?.toInt()?.let {
+            deviceCommunicator.setBrightness(
+                it
+            )
+        }
     }
 }

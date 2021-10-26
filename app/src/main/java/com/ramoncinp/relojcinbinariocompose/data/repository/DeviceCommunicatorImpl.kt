@@ -1,11 +1,14 @@
 package com.ramoncinp.relojcinbinariocompose.data.repository
 
+import com.ramoncinp.relojcinbinariocompose.data.mappers.percentageToPwmValue
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 import com.ramoncinp.relojcinbinariocompose.data.models.GetDeviceDataResponse
 import com.ramoncinp.relojcinbinariocompose.data.network.TcpClient
 import com.squareup.moshi.Moshi
+import timber.log.Timber
 import javax.inject.Inject
 
+@Suppress("BlockingMethodInNonBlockingContext")
 class DeviceCommunicatorImpl @Inject constructor(
     private val tcpClient: TcpClient,
     private val moshi: Moshi
@@ -28,8 +31,10 @@ class DeviceCommunicatorImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun setBrightness(percentage: Int) {
-        TODO("Not yet implemented")
+    override suspend fun setBrightness(percentage: Int) {
+        Timber.d("Received percentage is $percentage")
+        val pwmValue = percentageToPwmValue(percentage)
+        tcpClient.sendMessage("{\"key\":\"set_brightness\", \"value\":$pwmValue}")
     }
 
     override fun syncHour(currentHour: Int) {
