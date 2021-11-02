@@ -1,11 +1,9 @@
 package com.ramoncinp.relojcinbinariocompose.ui.main
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
@@ -15,12 +13,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ramoncinp.relojcinbinariocompose.data.getInitialBinaryTime
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.ramoncinp.relojcinbinariocompose.data.models.getInitialBinaryTime
 import com.ramoncinp.relojcinbinariocompose.ui.BinaryClock
+import com.ramoncinp.relojcinbinariocompose.ui.config.DeviceConfigurationScreen
 import com.ramoncinp.relojcinbinariocompose.ui.theme.RelojcinBinarioComposeTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,39 +33,43 @@ class MainActivity : ComponentActivity() {
                 MyApp()
             }
         }
-        initObservers()
-    }
-
-    private fun initObservers() {
-        viewModel.connectedDevices.observe(this) {
-            if (it.isNotEmpty())
-                Log.d("MainActivity", "Connected device ${it[0]}")
-        }
     }
 }
 
 @Composable
-fun AppBar(title: String) {
-    val viewModel: MainViewModel = viewModel()
+fun AppBar(title: String, actionOnClick: () -> Unit) {
+
     TopAppBar(
         title = { Text(text = title) },
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White,
         actions = {
-            IconButton(onClick = { viewModel.scanForDevices() }) {
+            IconButton(onClick = { actionOnClick.invoke() }) {
                 Icon(Icons.Filled.Settings, contentDescription = "App settings", tint = Color.White)
             }
-        }
-    )
+        })
 }
 
 @Composable
 fun MyApp() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "binary_clock") {
+        composable("binary_clock") { BinaryClockScreen(navController) }
+        composable("device_config") { DeviceConfigurationScreen(navController) }
+    }
+}
+
+@Composable
+fun BinaryClockScreen(navController: NavController) {
     val viewModel: MainViewModel = viewModel()
     val time = viewModel.currentBinaryTime.observeAsState(getInitialBinaryTime())
 
     Scaffold(
-        topBar = { AppBar(title = "Binary Clock") }
+        topBar = {
+            AppBar(title = "Binary Clock") {
+                navController.navigate("device_config")
+            }
+        }
     ) {
         Surface(
             modifier = Modifier.fillMaxSize()
