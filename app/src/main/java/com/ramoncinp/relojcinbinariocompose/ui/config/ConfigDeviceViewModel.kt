@@ -138,4 +138,28 @@ class ConfigDeviceViewModel @Inject constructor(
     fun onMessageShowed() {
         _message.value = ""
     }
+
+    fun playSong() = viewModelScope.launch {
+        try {
+            deviceCommunicator.playSound()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    fun stopSong() = viewModelScope.launch {
+        try {
+            deviceCommunicator.stopSound()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
+
+    fun rebootDevice() = viewModelScope.launch {
+        try {
+            deviceCommunicator.reboot()
+        } catch (e: Exception) {
+            Timber.e(e)
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package com.ramoncinp.relojcinbinariocompose.data.repository
 
-import com.ramoncinp.relojcinbinariocompose.data.mappers.percentageToPwmValue
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 import com.ramoncinp.relojcinbinariocompose.data.models.GetDeviceDataResponse
 import com.ramoncinp.relojcinbinariocompose.data.models.SetDeviceRequest
@@ -45,15 +44,15 @@ class DeviceCommunicatorImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun playSound() {
-        TODO("Not yet implemented")
+    override suspend fun playSound() {
+        tcpClient.sendMessage("{\"key\":\"play_song\"}")
     }
 
-    override fun stopSound() {
-        TODO("Not yet implemented")
+    override suspend fun stopSound() {
+        tcpClient.sendMessage("{\"key\":\"stop_song\"}")
     }
 
-    override fun reboot() {
-        TODO("Not yet implemented")
+    override suspend fun reboot() {
+        tcpClient.sendMessage("{\"key\":\"reboot\"}")
     }
 }

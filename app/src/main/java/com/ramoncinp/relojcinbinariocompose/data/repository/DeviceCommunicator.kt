@@ -14,9 +14,9 @@ interface DeviceCommunicator {
 
     fun syncHour(currentHour: Int)
 
-    fun playSound()
+    suspend fun playSound()
 
-    fun stopSound()
+    suspend fun stopSound()
 
-    fun reboot()
+    suspend fun reboot()
 }
