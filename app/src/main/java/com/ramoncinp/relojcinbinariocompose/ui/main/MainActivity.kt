@@ -11,13 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ramoncinp.relojcinbinariocompose.R
 import com.ramoncinp.relojcinbinariocompose.data.models.getInitialBinaryTime
+import com.ramoncinp.relojcinbinariocompose.domain.BINARY_CLOCK_ROUTE
+import com.ramoncinp.relojcinbinariocompose.domain.DEVICE_CONFIG_ROUTE
 import com.ramoncinp.relojcinbinariocompose.ui.BinaryClock
 import com.ramoncinp.relojcinbinariocompose.ui.config.DeviceConfigurationScreen
 import com.ramoncinp.relojcinbinariocompose.ui.theme.RelojcinBinarioComposeTheme
@@ -45,7 +49,11 @@ fun AppBar(title: String, actionOnClick: () -> Unit) {
         contentColor = Color.White,
         actions = {
             IconButton(onClick = { actionOnClick.invoke() }) {
-                Icon(Icons.Filled.Settings, contentDescription = "App settings", tint = Color.White)
+                Icon(
+                    Icons.Filled.Settings,
+                    contentDescription = stringResource(R.string.app_settings),
+                    tint = Color.White
+                )
             }
         })
 }
@@ -53,9 +61,9 @@ fun AppBar(title: String, actionOnClick: () -> Unit) {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "binary_clock") {
-        composable("binary_clock") { BinaryClockScreen(navController) }
-        composable("device_config") { DeviceConfigurationScreen(navController) }
+    NavHost(navController = navController, startDestination = BINARY_CLOCK_ROUTE) {
+        composable(BINARY_CLOCK_ROUTE) { BinaryClockScreen(navController) }
+        composable(DEVICE_CONFIG_ROUTE) { DeviceConfigurationScreen(navController) }
     }
 }
 
@@ -66,8 +74,8 @@ fun BinaryClockScreen(navController: NavController) {
 
     Scaffold(
         topBar = {
-            AppBar(title = "Binary Clock") {
-                navController.navigate("device_config")
+            AppBar(title = stringResource(R.string.binary_clock)) {
+                navController.navigate(DEVICE_CONFIG_ROUTE)
             }
         }
     ) {
