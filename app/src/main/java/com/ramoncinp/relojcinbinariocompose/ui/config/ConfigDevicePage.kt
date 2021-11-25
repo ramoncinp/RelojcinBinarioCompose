@@ -1,5 +1,6 @@
 package com.ramoncinp.relojcinbinariocompose.ui.config
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -120,14 +121,19 @@ fun DeviceConfigContent(
 
 @Composable
 fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltViewModel()) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         TextField(
             value = device.hourZone.toString(),
             onValueChange = { },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text(stringResource(R.string.time_zone)) },
             placeholder = { Text(stringResource(R.string.time_zone)) },
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.weight(4f)
         )
 
         Spacer(modifier = Modifier.size(16.dp))
@@ -137,6 +143,8 @@ fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltVi
             modifier = Modifier
                 .padding(16.dp)
                 .border(2.dp, MaterialTheme.colors.primary, shape = CircleShape)
+                .background(MaterialTheme.colors.surface)
+                .weight(1f)
         ) {
             Icon(
                 Icons.Default.KeyboardArrowDown,
@@ -144,13 +152,13 @@ fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltVi
             )
         }
 
-        Spacer(modifier = Modifier.size(8.dp))
-
         IconButton(
             onClick = { viewModel.addToTimeZone() },
             modifier = Modifier
                 .padding(16.dp)
                 .border(2.dp, MaterialTheme.colors.primary, shape = CircleShape)
+                .background(MaterialTheme.colors.surface)
+                .weight(1f)
         ) {
             Icon(
                 Icons.Default.KeyboardArrowUp,
@@ -166,11 +174,8 @@ fun AlarmTimeRow(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltView
         modifier = Modifier.fillMaxWidth()
     ) {
         TextField(
-            value = device.alarmHour.toString(),
-            onValueChange = { newVal ->
-                if (newVal.isNotEmpty())
-                    viewModel.editDevice(device.copy(alarmHour = newVal.toInt()))
-            },
+            value = device.alarmHour,
+            onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmHour = newVal)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text(stringResource(R.string.hour)) },
             placeholder = { Text(stringResource(R.string.hour)) },
@@ -178,11 +183,8 @@ fun AlarmTimeRow(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltView
         )
         Spacer(modifier = Modifier.width(16.dp))
         TextField(
-            value = device.alarmMinute.toString(),
-            onValueChange = { newVal ->
-                if (newVal.isNotEmpty())
-                    viewModel.editDevice(device.copy(alarmMinute = newVal.toInt()))
-            },
+            value = device.alarmMinute,
+            onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmMinute = newVal)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = { Text(stringResource(R.string.minute)) },
             placeholder = { Text(stringResource(R.string.minute)) },
@@ -196,7 +198,10 @@ fun BrightnessEditor(viewModel: ConfigDeviceViewModel = hiltViewModel()) {
     val brightnessValue = viewModel.brightnessPercentage.observeAsState(initial = 0f)
 
     Column {
-        Text(text = stringResource(R.string.brightness), modifier = Modifier.padding(bottom = 8.dp, top = 16.dp))
+        Text(
+            text = stringResource(R.string.brightness),
+            modifier = Modifier.padding(bottom = 8.dp, top = 16.dp)
+        )
         Row(modifier = Modifier.padding(end = 16.dp)) {
             Slider(
                 value = brightnessValue.value,
@@ -233,14 +238,24 @@ fun SubmitButtons(viewModel: ConfigDeviceViewModel = hiltViewModel()) {
             Text(stringResource(R.string.save))
         }
         Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = { }, contentPadding = PaddingValues(16.dp)) {
+        Button(onClick = { viewModel.playSong() }, contentPadding = PaddingValues(16.dp)) {
             Icon(
-                Icons.Filled.Refresh,
-                contentDescription = stringResource(R.string.sync_time),
+                Icons.Filled.PlayArrow,
+                contentDescription = stringResource(R.string.play_sound),
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(stringResource(R.string.sync_time))
+            Text(stringResource(R.string.play))
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+        Button(onClick = { viewModel.stopSong() }, contentPadding = PaddingValues(16.dp)) {
+            Icon(
+                Icons.Filled.Clear,
+                contentDescription = stringResource(R.string.stop_sound),
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.stop_sound))
         }
     }
 }
@@ -256,26 +271,6 @@ fun ActionsButtons(
             .padding(top = 24.dp)
     )
     {
-        Button(onClick = { viewModel.playSong() }, contentPadding = PaddingValues(16.dp)) {
-            Icon(
-                Icons.Filled.PlayArrow,
-                contentDescription = stringResource(R.string.play_sound),
-                modifier = Modifier.size(ButtonDefaults.IconSize)
-            )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(stringResource(R.string.play_sound))
-        }
-        Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = { viewModel.stopSong() }, contentPadding = PaddingValues(16.dp)) {
-            Icon(
-                Icons.Filled.Clear,
-                contentDescription = stringResource(R.string.stop_sound),
-                modifier = Modifier.size(ButtonDefaults.IconSize)
-            )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(stringResource(R.string.stop_sound))
-        }
-        Spacer(modifier = Modifier.size(16.dp))
         Button(
             onClick = {
                 viewModel.rebootDevice()

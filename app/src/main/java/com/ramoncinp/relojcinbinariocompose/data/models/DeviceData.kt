@@ -14,8 +14,8 @@ data class DeviceData(
     var ssid: String = "",
     var pass: String = "",
     var alarm: Boolean = false,
-    @Json(name = "alarm_hour") var alarmHour: Int = 0,
-    @Json(name = "alarm_minute") var alarmMinute: Int = 0,
+    @Json(name = "alarm_hour") var alarmHour: String = "",
+    @Json(name = "alarm_minute") var alarmMinute: String = "",
     @Json(name = "bright_percent") var brightPercent: Int = 0,
     @Json(name = "hzone") var hourZone: Int = 0,
 )
