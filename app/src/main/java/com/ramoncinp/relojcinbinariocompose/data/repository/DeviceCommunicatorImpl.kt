@@ -5,10 +5,10 @@ import com.ramoncinp.relojcinbinariocompose.data.models.GetDeviceDataResponse
 import com.ramoncinp.relojcinbinariocompose.data.models.SetDeviceRequest
 import com.ramoncinp.relojcinbinariocompose.data.network.TcpClient
 import com.squareup.moshi.Moshi
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@Suppress("BlockingMethodInNonBlockingContext")
 class DeviceCommunicatorImpl @Inject constructor(
     private val tcpClient: TcpClient,
     private val moshi: Moshi
@@ -18,41 +18,49 @@ class DeviceCommunicatorImpl @Inject constructor(
         tcpClient.ipAddress = host
     }
 
-    override suspend fun getData(): DeviceData? {
-        val rawResponse = tcpClient.sendMessage("{\"key\":\"get_data\"}")
-        val response = moshi.adapter(GetDeviceDataResponse::class.java).fromJson(rawResponse)
+    override suspend fun getData(): DeviceData? = withContext(Dispatchers.Default) {
+        runCatching {
+            val rawResponse = sendSimpleMessage("{\"key\":\"get_data\"}")
+            val response = moshi.adapter(GetDeviceDataResponse::class.java).fromJson(rawResponse)
+            response?.let { moshi.adapter(DeviceData::class.java).fromJson(it.message) }
+        }.getOrDefault(
+            null
+        )
+    }
 
-        return response?.let {
-            moshi.adapter(DeviceData::class.java).fromJson(it.message)
+    override suspend fun setData(deviceData: DeviceData): String =
+        withContext(Dispatchers.Default) {
+            runCatching {
+                val rawRequest = moshi.adapter(SetDeviceRequest::class.java).toJson(
+                    SetDeviceRequest(data = deviceData)
+                )
+                val rawResponse = sendSimpleMessage(rawRequest)
+                val response = moshi.adapter(GetDeviceDataResponse::class.java).fromJson(rawResponse)
+                response?.let {
+                    if (it.status == "ok") "Data correctly saved" else "Error saving the data"
+                } ?: "Data sent"
+            }.getOrDefault(
+                "Data sent"
+            )
         }
-    }
 
-    override suspend fun setData(deviceData: DeviceData) {
-        val rawRequest =
-            moshi.adapter(SetDeviceRequest::class.java).toJson(SetDeviceRequest(data = deviceData))
-
-        val response = tcpClient.sendMessage(rawRequest)
-        Timber.d(response)
-    }
-
-    override suspend fun setBrightness(pwmValue: Int) {
-        Timber.d("Received percentage is $pwmValue")
-        tcpClient.sendMessage("{\"key\":\"set_brightness\", \"value\":$pwmValue}")
-    }
-
-    override fun syncHour(currentHour: Int) {
-        TODO("Not yet implemented")
+    override suspend fun setBrightness(percentage: Int) {
+        sendSimpleMessage("{\"key\":\"set_brightness\", \"value\":$percentage}")
     }
 
     override suspend fun playSound() {
-        tcpClient.sendMessage("{\"key\":\"play_song\"}")
+        sendSimpleMessage("{\"key\":\"play_song\"}")
     }
 
     override suspend fun stopSound() {
-        tcpClient.sendMessage("{\"key\":\"stop_song\"}")
+        sendSimpleMessage("{\"key\":\"stop_song\"}")
     }
 
     override suspend fun reboot() {
-        tcpClient.sendMessage("{\"key\":\"reboot\"}")
+        sendSimpleMessage("{\"key\":\"reboot\"}")
+    }
+
+    private suspend fun sendSimpleMessage(message: String): String = withContext(Dispatchers.IO) {
+        tcpClient.sendMessage(message)
     }
 }

@@ -8,11 +8,9 @@ interface DeviceCommunicator {
 
     suspend fun getData(): DeviceData?
 
-    suspend fun setData(deviceData: DeviceData)
+    suspend fun setData(deviceData: DeviceData): String
 
-    suspend fun setBrightness(pwmValue: Int)
-
-    fun syncHour(currentHour: Int)
+    suspend fun setBrightness(percentage: Int)
 
     suspend fun playSound()
 
