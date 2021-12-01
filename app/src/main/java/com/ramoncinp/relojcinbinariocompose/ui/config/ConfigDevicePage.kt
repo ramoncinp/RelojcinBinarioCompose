@@ -1,5 +1,6 @@
 package com.ramoncinp.relojcinbinariocompose.ui.config
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,11 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ramoncinp.relojcinbinariocompose.R
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 
 @Composable
@@ -43,7 +46,7 @@ fun DeviceConfigurationScreen(navController: NavController) {
     Scaffold(
         scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
         topBar = {
-            AppBar(title = "Device Configuration", icon = Icons.Default.ArrowBack) {
+            AppBar(title = stringResource(R.string.device_conf), icon = Icons.Default.ArrowBack) {
                 navController.navigateUp()
             }
         }
@@ -57,7 +60,7 @@ fun DeviceConfigurationScreen(navController: NavController) {
                 if (connectedDevices.value.isEmpty()) {
                     NoDevicesMessage()
                 } else {
-                    DeviceConfigContent(selectedDevice.value, viewModel)
+                    DeviceConfigContent(selectedDevice.value, navController)
                 }
             }
         }
@@ -65,7 +68,11 @@ fun DeviceConfigurationScreen(navController: NavController) {
 }
 
 @Composable
-fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
+fun DeviceConfigContent(
+    device: DeviceData,
+    navController: NavController,
+    viewModel: ConfigDeviceViewModel = hiltViewModel()
+) {
     Column(
         modifier = Modifier.padding(16.dp),
         horizontalAlignment = Alignment.Start
@@ -73,8 +80,8 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
         TextField(
             value = device.ssid,
             onValueChange = { newVal -> viewModel.editDevice(device.copy(ssid = newVal)) },
-            label = { Text("SSID") },
-            placeholder = { Text("SSID") },
+            label = { Text(stringResource(R.string.ssid)) },
+            placeholder = { Text(stringResource(R.string.ssid)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
@@ -85,42 +92,48 @@ fun DeviceConfigContent(device: DeviceData, viewModel: ConfigDeviceViewModel) {
             onValueChange = { newVal -> viewModel.editDevice(device.copy(pass = newVal)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             visualTransformation = PasswordVisualTransformation(),
-            label = { Text("Password") },
-            placeholder = { Text("Password") },
+            label = { Text(stringResource(R.string.password)) },
+            placeholder = { Text(stringResource(R.string.password)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp)
         )
 
-        TimeZoneEditor(device, viewModel)
+        TimeZoneEditor(device)
 
         Row(modifier = Modifier.padding(bottom = 16.dp)) {
             Switch(
                 checked = device.alarm,
-                onCheckedChange = { newVal -> viewModel.editDevice(device.copy(alarm = newVal)) })
-            Text("Alarm", modifier = Modifier.padding(start = 24.dp))
+                onCheckedChange = { newVal -> viewModel.editDevice(device.copy(alarm = newVal)) }
+            )
+            Text(stringResource(R.string.alarm), modifier = Modifier.padding(start = 24.dp))
         }
 
         if (device.alarm) {
-            AlarmTimeRow(device, viewModel)
+            AlarmTimeRow(device)
         }
 
-        BrightnessEditor(viewModel)
-        SubmitButtons(viewModel)
-        ActionsButtons(viewModel)
+        BrightnessEditor()
+        SubmitButtons()
+        ActionsButtons(navController)
     }
 }
 
 @Composable
-fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltViewModel()) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         TextField(
             value = device.hourZone.toString(),
             onValueChange = { },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text("Time zone") },
-            placeholder = { Text("Time zone") },
-            modifier = Modifier.padding(bottom = 16.dp)
+            label = { Text(stringResource(R.string.time_zone)) },
+            placeholder = { Text(stringResource(R.string.time_zone)) },
+            modifier = Modifier.weight(4f)
         )
 
         Spacer(modifier = Modifier.size(16.dp))
@@ -130,66 +143,65 @@ fun TimeZoneEditor(device: DeviceData, viewModel: ConfigDeviceViewModel) {
             modifier = Modifier
                 .padding(16.dp)
                 .border(2.dp, MaterialTheme.colors.primary, shape = CircleShape)
+                .background(MaterialTheme.colors.surface)
+                .weight(1f)
         ) {
             Icon(
                 Icons.Default.KeyboardArrowDown,
-                contentDescription = "Subtract to time zone"
+                contentDescription = stringResource(R.string.substract_time_zone)
             )
         }
-
-        Spacer(modifier = Modifier.size(8.dp))
 
         IconButton(
             onClick = { viewModel.addToTimeZone() },
             modifier = Modifier
                 .padding(16.dp)
                 .border(2.dp, MaterialTheme.colors.primary, shape = CircleShape)
+                .background(MaterialTheme.colors.surface)
+                .weight(1f)
         ) {
             Icon(
                 Icons.Default.KeyboardArrowUp,
-                contentDescription = "Add to time zone"
+                contentDescription = stringResource(R.string.add_time_zone)
             )
         }
     }
 }
 
 @Composable
-fun AlarmTimeRow(device: DeviceData, viewModel: ConfigDeviceViewModel) {
+fun AlarmTimeRow(device: DeviceData, viewModel: ConfigDeviceViewModel = hiltViewModel()) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
         TextField(
-            value = device.alarmHour.toString(),
-            onValueChange = { newVal ->
-                if (newVal.isNotEmpty())
-                    viewModel.editDevice(device.copy(alarmHour = newVal.toInt()))
-            },
+            value = device.alarmHour,
+            onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmHour = newVal)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text("Hour") },
-            placeholder = { Text("Hour") },
+            label = { Text(stringResource(R.string.hour)) },
+            placeholder = { Text(stringResource(R.string.hour)) },
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(16.dp))
         TextField(
-            value = device.alarmMinute.toString(),
-            onValueChange = { newVal ->
-                if (newVal.isNotEmpty())
-                    viewModel.editDevice(device.copy(alarmMinute = newVal.toInt()))
-            },
+            value = device.alarmMinute,
+            onValueChange = { newVal -> viewModel.editDevice(device.copy(alarmMinute = newVal)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            label = { Text("Minute") },
-            placeholder = { Text("Minute") },
+            label = { Text(stringResource(R.string.minute)) },
+            placeholder = { Text(stringResource(R.string.minute)) },
             modifier = Modifier.weight(1f)
         )
     }
 }
 
 @Composable
-fun BrightnessEditor(viewModel: ConfigDeviceViewModel) {
+fun BrightnessEditor(viewModel: ConfigDeviceViewModel = hiltViewModel()) {
     val brightnessValue = viewModel.brightnessPercentage.observeAsState(initial = 0f)
 
     Column {
-        Text(text = "Brightness", modifier = Modifier.padding(bottom = 8.dp, top = 16.dp))
+        Text(
+            text = stringResource(R.string.brightness),
+            modifier = Modifier.padding(bottom = 8.dp, top = 16.dp)
+        )
         Row(modifier = Modifier.padding(end = 16.dp)) {
             Slider(
                 value = brightnessValue.value,
@@ -201,7 +213,7 @@ fun BrightnessEditor(viewModel: ConfigDeviceViewModel) {
                 onClick = { viewModel.sendNewBrightnessValue() }) {
                 Icon(
                     Icons.Default.Check,
-                    contentDescription = "Set brightness"
+                    contentDescription = stringResource(R.string.set_brightness)
                 )
             }
         }
@@ -209,7 +221,7 @@ fun BrightnessEditor(viewModel: ConfigDeviceViewModel) {
 }
 
 @Composable
-fun SubmitButtons(viewModel: ConfigDeviceViewModel) {
+fun SubmitButtons(viewModel: ConfigDeviceViewModel = hiltViewModel()) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,62 +231,58 @@ fun SubmitButtons(viewModel: ConfigDeviceViewModel) {
         Button(onClick = { viewModel.setDeviceData() }, contentPadding = PaddingValues(16.dp)) {
             Icon(
                 Icons.Filled.Send,
-                contentDescription = "Save form data",
+                contentDescription = stringResource(R.string.save_form_data),
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Save")
+            Text(stringResource(R.string.save))
         }
         Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = { }, contentPadding = PaddingValues(16.dp)) {
+        Button(onClick = { viewModel.playSong() }, contentPadding = PaddingValues(16.dp)) {
             Icon(
-                Icons.Filled.Refresh,
-                contentDescription = "Sync time",
+                Icons.Filled.PlayArrow,
+                contentDescription = stringResource(R.string.play_sound),
                 modifier = Modifier.size(ButtonDefaults.IconSize)
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Sync Time")
+            Text(stringResource(R.string.play))
+        }
+        Spacer(modifier = Modifier.size(16.dp))
+        Button(onClick = { viewModel.stopSong() }, contentPadding = PaddingValues(16.dp)) {
+            Icon(
+                Icons.Filled.Clear,
+                contentDescription = stringResource(R.string.stop_sound),
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.stop_sound))
         }
     }
 }
 
 @Composable
-fun ActionsButtons(viewModel: ConfigDeviceViewModel) {
+fun ActionsButtons(
+    navController: NavController,
+    viewModel: ConfigDeviceViewModel = hiltViewModel()
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp)
     )
     {
-        Button(onClick = { viewModel.playSong() }, contentPadding = PaddingValues(16.dp)) {
-            Icon(
-                Icons.Filled.PlayArrow,
-                contentDescription = "Play sound",
-                modifier = Modifier.size(ButtonDefaults.IconSize)
-            )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Play")
-        }
-        Spacer(modifier = Modifier.size(16.dp))
-        Button(onClick = { viewModel.stopSong() }, contentPadding = PaddingValues(16.dp)) {
-            Icon(
-                Icons.Filled.Clear,
-                contentDescription = "Stop sound",
-                modifier = Modifier.size(ButtonDefaults.IconSize)
-            )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text("Stop sound")
-        }
-        Spacer(modifier = Modifier.size(16.dp))
         Button(
-            onClick = { viewModel.rebootDevice() },
+            onClick = {
+                viewModel.rebootDevice()
+                navController.navigateUp()
+            },
             contentPadding = PaddingValues(16.dp),
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Red,
                 contentColor = Color.White
             )
         ) {
-            Text("Reboot")
+            Text(stringResource(R.string.reboot))
         }
     }
 }
@@ -288,7 +296,7 @@ fun AppBar(title: String, icon: ImageVector, navigationClickAction: () -> Unit) 
         navigationIcon = {
             Icon(
                 icon,
-                "Navigation Icon",
+                stringResource(R.string.nav_icon),
                 modifier = Modifier
                     .padding(12.dp)
                     .clickable { navigationClickAction.invoke() }
@@ -313,6 +321,6 @@ fun NoDevicesMessage() {
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text("No devices", style = MaterialTheme.typography.h5)
+        Text(stringResource(R.string.no_devices), style = MaterialTheme.typography.h5)
     }
 }

@@ -6,17 +6,17 @@ import com.ramoncinp.relojcinbinariocompose.domain.toBinaryNibbleString
 class BcdBinaryTimeMapper {
 
     /**
-     * input: Date formated as "HHmmss" like "153032" for 15:30:32
+     * input: Date formatted as "HHmmss" like "153032" for 15:30:32
      */
     fun fromFormattedTime(formattedDate: String): BcdBinaryTime {
-        val listOfResults = formattedDate.toList().map {
+        val listOfCharacters = formattedDate.toList().map {
             it.toString().toInt()
         }
 
-        val binaryResults = listOfResults.map { intResult ->
+        val binaryNibbles = listOfCharacters.map { intResult ->
             intResult.toBinaryNibbleString()
         }
 
-        return BcdBinaryTime(binaryResults)
+        return BcdBinaryTime(binaryNibbles)
     }
 }

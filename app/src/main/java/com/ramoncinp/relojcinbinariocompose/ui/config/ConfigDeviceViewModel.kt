@@ -4,8 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ramoncinp.relojcinbinariocompose.data.mappers.percentageToPwmValue
-import com.ramoncinp.relojcinbinariocompose.data.mappers.pwmValueToPercentage
 import com.ramoncinp.relojcinbinariocompose.data.models.DeviceData
 import com.ramoncinp.relojcinbinariocompose.data.network.DeviceScanner
 import com.ramoncinp.relojcinbinariocompose.data.repository.DeviceCommunicator
@@ -72,10 +70,11 @@ class ConfigDeviceViewModel @Inject constructor(
             val deviceData = deviceCommunicator.getData()
             deviceData?.let { data ->
                 _selectedDevice.value = data
-                _brightnessPercentage.value = pwmValueToPercentage(deviceData.pwmValue) / 100f
+                _brightnessPercentage.value = deviceData.brightPercent / 100f
             }
         } catch (e: Exception) {
             Timber.e(e.toString())
+            _message.value = "Error fetching data :("
         }
     }
 
@@ -83,12 +82,11 @@ class ConfigDeviceViewModel @Inject constructor(
         _isLoading.value = true
         try {
             _selectedDevice.value?.let { data ->
-                deviceCommunicator.setData(data)
+                val response = deviceCommunicator.setData(data)
+                _message.value = response
             }
-
-            _message.value = "Data successfully set"
         } catch (e: Exception) {
-            Timber.e(e.toString())
+            _message.value = "Error communicating to the device"
         }
         _isLoading.value = false
     }
@@ -122,16 +120,22 @@ class ConfigDeviceViewModel @Inject constructor(
     }
 
     fun setBrightnessValue(newValue: Float) {
-        Timber.d("The new brightness value is $newValue")
         _brightnessPercentage.value = newValue
     }
 
-    fun sendNewBrightnessValue() = viewModelScope.launch {
-        val percentageValue = _brightnessPercentage.value?.times(100)?.toInt()
-        percentageValue?.let {
-            val pwmValue = percentageToPwmValue(it)
-            _selectedDevice.value?.pwmValue = pwmValue
-            deviceCommunicator.setBrightness(pwmValue)
+    fun sendNewBrightnessValue() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val percentageValue = _brightnessPercentage.value?.times(100)?.toInt()
+                percentageValue?.let { percentage ->
+                    _selectedDevice.value?.brightPercent = percentage
+                    deviceCommunicator.setBrightness(percentage)
+                }
+            } catch (e: Exception) {
+                _message.value = "Error trying to set the brightness"
+            }
+            _isLoading.value = false
         }
     }
 
@@ -140,26 +144,32 @@ class ConfigDeviceViewModel @Inject constructor(
     }
 
     fun playSong() = viewModelScope.launch {
+        _isLoading.value = true
         try {
             deviceCommunicator.playSound()
         } catch (e: Exception) {
-            Timber.e(e)
+            _message.value = "Error communicating to the device"
         }
+        _isLoading.value = false
     }
 
     fun stopSong() = viewModelScope.launch {
+        _isLoading.value = true
         try {
             deviceCommunicator.stopSound()
         } catch (e: Exception) {
-            Timber.e(e)
+            _message.value = "Error communicating to the device"
         }
+        _isLoading.value = false
     }
 
     fun rebootDevice() = viewModelScope.launch {
+        _isLoading.value = true
         try {
             deviceCommunicator.reboot()
         } catch (e: Exception) {
-            Timber.e(e)
+            _message.value = "Error communicating to the device"
         }
+        _isLoading.value = false
     }
 }
