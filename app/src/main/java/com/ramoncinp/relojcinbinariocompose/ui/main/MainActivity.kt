@@ -91,6 +91,6 @@ fun BinaryClockScreen(navController: NavController) {
 @Composable
 fun DefaultPreview() {
     RelojcinBinarioComposeTheme {
-        MyApp()
+        BinaryClock(getInitialBinaryTime())
     }
 }
